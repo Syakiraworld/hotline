@@ -10,10 +10,9 @@ st.set_page_config(page_title='QTY Dashboard with Plotly', layout='wide')
 def load_excel_sheets(file_path):
     """Membaca semua sheet dari file Excel"""
     all_sheets = pd.read_excel(file_path, sheet_name=None)
-    # Pastikan kolom Date menjadi datetime di setiap sheet
     for name, sheet in all_sheets.items():
         sheet['Date'] = pd.to_datetime(sheet['Date'], dayfirst=True, errors='coerce')
-        sheet['Month'] = name  # tambahkan nama sheet sebagai kolom Bulan
+        sheet['Month'] = name
     return all_sheets
 
 @st.cache_data
@@ -48,7 +47,6 @@ customers = st.sidebar.multiselect(
     default=df['CUSTOMER'].unique()
 )
 
-# Filter hanya berdasarkan customer
 filtered_df = df[df['CUSTOMER'].isin(customers)]
 
 # --- METRICS ---
@@ -57,7 +55,7 @@ col1.metric("Total QTY", f"{filtered_df['QTY'].sum():,.0f}")
 col2.metric("Average QTY", f"{filtered_df['QTY'].mean():,.2f}")
 col3.metric("Records", len(filtered_df))
 
-# --- CHARTS: LINE + CUSTOMER BAR ---
+# --- CHARTS ---
 col1, col2 = st.columns(2)
 with col1:
     fig_line = px.line(
@@ -110,3 +108,17 @@ st.plotly_chart(fig_top, use_container_width=True)
 # --- TABLE ---
 st.subheader("📋 Filtered Data")
 st.dataframe(filtered_df)
+
+# --- FOOTER (FIXED DARI ERROR REGEX STREAMLIT) ---
+st.markdown(
+    """
+    <style>
+    footer {visibility: hidden;}
+    .css-164nlkn.e8zbici2 {display: none;}
+    </style>
+    <div style='text-align: center; padding: 10px; margin-top: 30px; font-size: 13px; color: gray;'>
+        Created by <b>Syakira</b> 🖤
+    </div>
+    """,
+    unsafe_allow_html=True
+)
